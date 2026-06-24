@@ -4,17 +4,18 @@ import scala.math.BigDecimal.RoundingMode
 
 
 sealed trait BillError
+
 case class ItemNotFound(name: String) extends BillError
-object BillingService {
+
+class BillingService(menuItemRepo: MenuItemsRepo) {
 
   def calculateBill(itemNames: List[String]): Either[BillError, BigDecimal] = {
-
     val initial: Either[BillError, List[MenuItem]] = Right(Nil)
 
     val itemsEither = itemNames.foldLeft(initial) { (acc, name) =>
       for {
         list <- acc
-        item <- Menu.items.get(name).toRight(ItemNotFound(name))
+        item <- menuItemRepo.findItem(name).toRight(ItemNotFound(name))
       } yield list :+ item
     }
 

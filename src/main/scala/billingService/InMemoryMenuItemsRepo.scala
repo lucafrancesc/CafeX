@@ -1,6 +1,12 @@
 package billingService
 
-object Menu {
+trait MenuItemsRepo {
+  def findItem(itemName: String): Option[MenuItem]
+
+  def listItems(): List[String]
+}
+
+object InMemoryMenuItemsRepo extends MenuItemsRepo {
 
   private val Cola =
     MenuItem("Cola", 0.50, Drink, isHot = false)
@@ -14,13 +20,17 @@ object Menu {
   private val SteakSandwich =
     MenuItem("Steak Sandwich", 4.50, Food, isHot = true)
 
-  val items: Map[String, MenuItem] =
-    List(
-      Cola,
-      Coffee,
-      CheeseSandwich,
-      SteakSandwich
-    ).map(i => i.name -> i).toMap
+  private val items: Map[String, MenuItem] = List(
+    Cola,
+    Coffee,
+    CheeseSandwich,
+    SteakSandwich
+  ).map(i => i.name -> i).toMap
+
+  def listItems(): List[String] = items.keys.toList
+
+  def findItem(itemName: String): Option[MenuItem] = items.get(itemName)
+
 }
 
 
