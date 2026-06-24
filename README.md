@@ -9,11 +9,18 @@ Required to run:
 
 [info] welcome to sbt 1.12.13 (Ubuntu Java 21.0.11)
 
+
+```bash
+sbt "run \"Cola\" \"Steak Sandwich\""
+```
+
+It will return an ItemNotFound error for mispelling or missing items
+
+```bash
+sbt "run \"Generic Soda\" \"Steak Sandwich\""
+```
+
 Use the following to run the tests
 ```bash
 sbt test
 ```
-
-Feel free to check out the `error-handling` branch.
-In this solution if we "scan" a non-existing item I made the call to return 0.
-The other solution returns an Either + there is a small CLI.
