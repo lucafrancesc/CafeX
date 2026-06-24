@@ -2,19 +2,27 @@ package billingService
 
 import scala.math.BigDecimal.RoundingMode
 
+
+sealed trait BillError
+case class ItemNotFound(name: String) extends BillError
 object BillingService {
 
-  def calculateBill(itemNames: List[String]): BigDecimal = {
-    val itemsFound: List[MenuItem] = itemNames.flatMap { name =>
-      Menu.items.get(name)
+  def calculateBill(itemNames: List[String]): Either[BillError, BigDecimal] = {
+
+    val initial: Either[BillError, List[MenuItem]] = Right(Nil)
+
+    val itemsEither = itemNames.foldLeft(initial) { (acc, name) =>
+      for {
+        list <- acc
+        item <- Menu.items.get(name).toRight(ItemNotFound(name))
+      } yield list :+ item
     }
 
-    if (itemsFound.isEmpty) return BigDecimal(0)
-
-    val totalBeforeServiceCharge: BigDecimal = itemsFound.map(_.price).sum
-    val serviceCharge = calculateServiceCharge(itemsFound, totalBeforeServiceCharge)
-
-    totalBeforeServiceCharge + serviceCharge
+    itemsEither.map { itemsFound =>
+      val totalBeforeCharge = itemsFound.map(_.price).sum
+      val serviceCharge = calculateServiceCharge(itemsFound, totalBeforeCharge)
+      totalBeforeCharge + serviceCharge
+    }
   }
 
   private[billingService] def calculateServiceCharge(itemsFound: List[MenuItem], total: BigDecimal): BigDecimal = {
