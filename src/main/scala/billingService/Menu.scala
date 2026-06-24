@@ -1,4 +1,4 @@
-package BillingService
+package billingService
 
 object Menu {
 
